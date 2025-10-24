@@ -1,10 +1,7 @@
 using Rocket.API;
-using Rocket.Unturned.Player;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using S1thK3nny.SWAT.Models.Teams;
-using S1thK3nny.SWAT.Models.Databases;
 using S1thK3nny.SWAT.Helpers;
 
 namespace S1thK3nny.SWAT.Commands
@@ -16,6 +13,12 @@ namespace S1thK3nny.SWAT.Commands
         // TODO: Ensure early return if ran during match
         public void Execute(IRocketPlayer caller, string[] command)
         {
+
+            if (GameStateManager.Instance.CurrentState != GameState.Idle)
+            {
+                ChatHelper.SendTo(caller, "GameIsCurrentlyRunning", ChatLevel.ERROR);
+                return;
+            }
 
             if (!CommandHelpers.TryResolveTargetSteam64ID(caller, command, 0, out var targetSteam64ID, out var errKey, out var errArgs))
             {

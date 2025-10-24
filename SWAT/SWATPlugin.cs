@@ -10,6 +10,7 @@ using Rocket.Unturned;
 using S1thK3nny.SWAT.Database;
 using S1thK3nny.SWAT.Models.Teams;
 using S1thK3nny.SWAT.Helpers;
+using Rocket.Unturned.Events;
 
 namespace S1thK3nny.SWAT
 {
@@ -31,7 +32,11 @@ namespace S1thK3nny.SWAT
             perMapInfosDatabase = new PerMapInfosXmlDatabase();
             perMapInfosDatabase.Load();
 
+            // Initialize GameStateManager
+            GameStateManager.Initialize();
+
             U.Events.OnPlayerConnected += OnPlayerConnected;
+            UnturnedPlayerEvents.OnPlayerDeath += OnPlayerDeath;
 
             Logger.Log($"{Name} {Assembly.GetName().Version.ToString(3)} has been loaded!", ConsoleColor.Yellow);
         }
@@ -40,6 +45,10 @@ namespace S1thK3nny.SWAT
         protected override void Unload()
         {
             U.Events.OnPlayerConnected -= OnPlayerConnected;
+            UnturnedPlayerEvents.OnPlayerDeath -= OnPlayerDeath;
+
+            // Shutdown GameStateManager
+            GameStateManager.Shutdown();
 
             AllegianceDatabase.Save();
             perMapInfosDatabase.Save();
@@ -65,7 +74,10 @@ namespace S1thK3nny.SWAT
             { "CommandRegisterPositionSaved", "Position registered for player [[b]]{0}[[/b]] for team [[b]]{1}[[/b]] on map [[b]]{2}[[/b]]!" },
 
             { "CommandRegisterSWATVehicleSyntax", "Usage: /svehicle <vehicleID>" },
-            { "CommandRegisterSWATVehicleSaved", "SWAT vehicle [[b]]{0}[[/b]] spawn registered on map [[b]]{1}[[/b]]!" }
+            { "CommandRegisterSWATVehicleSaved", "SWAT vehicle [[b]]{0}[[/b]] spawn registered on map [[b]]{1}[[/b]]!" },
+
+            { "NoGameIsCurrentlyRunning", "No game is currently running!" },
+            { "GameIsCurrentlyRunning", "A game is currently running. You cannot use this command right now." }
         };
 
         public ALLEGIANCE getPlayerAllegiance(ulong steam64ID)
@@ -92,6 +104,15 @@ namespace S1thK3nny.SWAT
             }
             Console.WriteLine($"[SWATPlugin] Player connected: {unturnedPlayer.DisplayName} ({unturnedPlayer.CSteamID.m_SteamID})");
             Console.WriteLine($"[SWATPlugin] Allegiance data: {allegiance}");
+        }
+
+        // Event handler for player deaths
+        public void OnPlayerDeath(UnturnedPlayer player, SDG.Unturned.EDeathCause cause, SDG.Unturned.ELimb limb, Steamworks.CSteamID murderer)
+        {
+            if (GameStateManager.Instance != null)
+            {
+                GameStateManager.Instance.OnPlayerDeath(player.CSteamID.m_SteamID);
+            }
         }
     }
 }

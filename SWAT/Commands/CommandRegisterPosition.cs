@@ -41,6 +41,12 @@ namespace S1thK3nny.SWAT.Commands
 
             (Vector3 unityPos, Vector3 unityRot) = CommandHelpers.GetPlayerPositionAndRotation((UnturnedPlayer)caller);
 
+            if (GameStateManager.Instance.CurrentState != GameState.Idle)
+            {
+                ChatHelper.SendTo(caller, "GameIsCurrentlyRunning", ChatLevel.ERROR);
+                return;
+            }
+
             var payload = new PlayerInfo
             {
                 Steam64Id = steam64ID,

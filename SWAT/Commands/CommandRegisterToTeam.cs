@@ -23,6 +23,12 @@ namespace S1thK3nny.SWAT.Commands
                 return;
             }
 
+            if (GameStateManager.Instance.CurrentState != GameState.Idle)
+            {
+                ChatHelper.SendTo(caller, "GameIsCurrentlyRunning", ChatLevel.ERROR);
+                return;
+            }
+
             // Parse allegiance, check if there already is one
             if (!CommandHelpers.TryParseAllegiance(command[0], out ALLEGIANCE allegiance, out var errKeyA, out var errArgsA))
             {

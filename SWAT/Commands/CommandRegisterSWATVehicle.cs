@@ -25,6 +25,12 @@ namespace S1thK3nny.SWAT.Commands
                 return;
             }
 
+            if (GameStateManager.Instance.CurrentState != GameState.Idle)
+            {
+                ChatHelper.SendTo(caller, "GameIsCurrentlyRunning", ChatLevel.ERROR);
+                return;
+            }
+
             var payload = new SwatVehicleInfos
             {
                 VehicleID = long.Parse(command[0]),
