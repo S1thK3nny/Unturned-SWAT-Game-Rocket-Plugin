@@ -13,6 +13,7 @@ namespace S1thK3nny.SWAT.Commands
     {
         private SWATPlugin pluginInstance => SWATPlugin.Instance;
 
+        // TODO: Ensure early return if ran during match
         public void Execute(IRocketPlayer caller, string[] command)
         {
 
@@ -45,7 +46,7 @@ namespace S1thK3nny.SWAT.Commands
 
         public string Help => "Unregister a player from a team.";
 
-        public string Syntax => "[Steam64ID]";
+        public string Syntax => "[Steam64ID or PlayerName]";
 
         public List<string> Aliases => [ "sunregister" ];
 

@@ -13,6 +13,7 @@ namespace S1thK3nny.SWAT.Commands
     {
         private SWATPlugin pluginInstance => SWATPlugin.Instance;
 
+        // TODO: Ensure early return if ran during match
         public void Execute(IRocketPlayer caller, string[] command)
         {
             // Check if allegiance argument is provided
@@ -41,7 +42,12 @@ namespace S1thK3nny.SWAT.Commands
                 .FirstOrDefault(x => x.Steam64ID == targetSteam64ID);
             if (existingData != null)
             {
-                ChatHelper.SendTo(caller, "PlayerAlreadyRegistered", ChatLevel.ERROR, new[] { Convert.ToString(targetSteam64ID), existingData.Team.ToString() });
+                existingData.Team = allegiance;
+
+                PlayerNameHelper.SetPlayerName(targetSteam64ID, allegiance);
+                ChatHelper.SendTo(caller, "PlayerSwitchedTeams", ChatLevel.OK, new[] { Convert.ToString(targetSteam64ID), allegiance.ToString() });
+
+                pluginInstance.AllegianceDatabase.Save();
                 return;
             }
 
@@ -60,7 +66,7 @@ namespace S1thK3nny.SWAT.Commands
 
         public string Help => "Register a player to a team. Options are SWAT or TERRORIST.";
 
-        public string Syntax => "<Allegiance> [Steam64ID]";
+        public string Syntax => "<Allegiance> [Steam64ID or PlayerName]";
     
         public List<string> Aliases => [ "sregister", "steam" ];
 

@@ -4,11 +4,7 @@ using Rocket.Core.Logging;
 using Rocket.Core.Plugins;
 using Rocket.Unturned.Chat;
 using Rocket.Unturned.Player;
-using Rocket.Unturned.Events;
-using S1thK3nny.SWAT.Models.Databases;
-using SDG.Unturned;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Rocket.Unturned;
 using S1thK3nny.SWAT.Database;
@@ -54,12 +50,12 @@ namespace S1thK3nny.SWAT
         public override TranslationList DefaultTranslations => new()
         {
             { "SwatTestMessage", "[[b]]SWAT Plugin[[/b]] is working! Welcome to the team, operative!" },
-            { "CommandRegisterToTeamSyntax", "Usage: /sregister <Allegiance> [Steam64ID]" },
+            { "CommandRegisterToTeamSyntax", "Usage: /sregister <Allegiance> [Steam64ID or PlayerName]" },
             { "InvalidAllegiance", "Invalid allegiance '{0}'. Use SWAT or TERRORIST." },
-            { "InvalidSteam64ID", "Invalid Steam64ID: {0}" },
+            { "InvalidSteam64IDOrPlayerName", "Invalid Steam64ID or PlayerName: {0}" },
             { "MustSpecifySteam64IDFromConsole", "You must specify a Steam64ID when using this command from console." },
 
-            { "PlayerAlreadyRegistered", "Player {0} is already registered to team [[b]]{1}[[/b]]. Use /sunregister to unregister first." },
+            { "PlayerSwitchedTeams", "Player {0} has switched to team [[b]]{1}[[/b]]!" },
             { "PlayerRegisteredToTeam", "Player {0} has been registered to team [[b]]{1}[[/b]]!" },
 
             { "PlayerNotRegistered", "Player {0} is not registered to any team." },

@@ -6,14 +6,16 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using S1thK3nny.SWAT.Models.Databases;
+using SDG.Unturned;
 
 namespace S1thK3nny.SWAT.Helpers
 {
     public static class CommandHelpers
     {
         /// <summary>
-        /// Ermittelt die Ziel-Steam64ID aus dem Command-Array (optional) oder dem Caller.
-        /// Gibt bei Fehlern einen Übersetzungsschlüssel + Platzhalter zurück.
+        /// Resolves the target Steam64ID from the command array (optional) or from the caller.
+        /// Accepts either a Steam64ID or a player name.
+        /// Returns an error key and placeholders on failure.
         /// </summary>
         public static bool TryResolveTargetSteam64ID(
             IRocketPlayer caller,
@@ -27,19 +29,62 @@ namespace S1thK3nny.SWAT.Helpers
             errorKey = null;
             errorArgs = null;
 
-            // Fall 1: Steam64 via Argument
+            // Case 1: Steam64ID or PlayerName via Argument
             if (command.Length > argIndex)
             {
-                if (!ulong.TryParse(command[argIndex], out steam64))
+                string input = command[argIndex];
+                
+                // First, try to parse it as a Steam64ID
+                if (ulong.TryParse(input, out steam64))
                 {
-                    errorKey = "InvalidSteam64ID";
-                    errorArgs = new object[] { command[argIndex] };
-                    return false;
+                    return true;
                 }
-                return true;
+                
+                // If it's not a Steam64ID, try to find it as a player name
+                Player foundPlayer = null;
+                
+                // Search for exact name match (case-insensitive)
+                foreach (var client in Provider.clients)
+                {
+                    if (client.player == null) continue;
+                    
+                    string playerName = client.player.channel.owner.playerID.characterName;
+                    if (string.Equals(playerName, input, StringComparison.OrdinalIgnoreCase))
+                    {
+                        foundPlayer = client.player;
+                        break;
+                    }
+                }
+                
+                // If no exact match, search for partial match
+                if (foundPlayer == null)
+                {
+                    foreach (var client in Provider.clients)
+                    {
+                        if (client.player == null) continue;
+                        
+                        string playerName = client.player.channel.owner.playerID.characterName;
+                        if (playerName.IndexOf(input, StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            foundPlayer = client.player;
+                            break;
+                        }
+                    }
+                }
+                
+                if (foundPlayer != null)
+                {
+                    steam64 = foundPlayer.channel.owner.playerID.steamID.m_SteamID;
+                    return true;
+                }
+                
+                // Neither Steam64ID nor player name found
+                errorKey = "InvalidSteam64IDOrPlayerName";
+                errorArgs = new object[] { input };
+                return false;
             }
 
-            // Fall 2: Aus Caller ableiten
+            // Case 2: Derive from caller
             if (caller is ConsolePlayer)
             {
                 errorKey = "MustSpecifySteam64IDFromConsole";
@@ -52,7 +97,7 @@ namespace S1thK3nny.SWAT.Helpers
         }
 
         /// <summary>
-        /// Optional: Allegiance robust parsen.
+        /// Parses allegiance from string input robustly.
         /// </summary>
         public static bool TryParseAllegiance(
             string token,
