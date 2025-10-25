@@ -263,7 +263,8 @@ namespace S1thK3nny.SWAT
         }
 
         /// <summary>
-        /// Gives kits to all players using /kit command        TODO: Does this even work?
+        /// Gives kits to all players using /kit command.
+        /// Uses player display names instead of Steam64IDs.
         /// </summary>
         private void GivePlayerKits()
         {
@@ -272,9 +273,13 @@ namespace S1thK3nny.SWAT
                 var player = UnturnedPlayer.FromCSteamID(new Steamworks.CSteamID(steamId));
                 if (player != null)
                 {
-                    // Execute /kit <Steam64ID> <Steam64ID>
+                    // Execute /kit <PlayerName> <PlayerName>
                     // This assumes you have RestoreMonarchys Kits plugin installed
-                    ChatManager.serverSendMessage($"/kit {steamId} {steamId}", Color.white, null, player.SteamPlayer(), EChatMode.SAY, null, true);
+                    // If names contain spaces, wrap in quotes
+                    if (!KitGiver.TryGiveKitToPlayer(player, out string error))
+                    {
+                        ChatHelper.SendTo(player, ChatLevel.ERROR, $"Failed to give kit to {player.DisplayName}: {error}");
+                    }
                 }
             }
         }

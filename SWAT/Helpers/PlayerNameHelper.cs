@@ -38,7 +38,7 @@ namespace S1thK3nny.SWAT.Helpers
             }
         }
 
-        private static string GetOriginalName(Player player)
+        public static string GetOriginalName(Player player)
         {
             string currentName = player.channel.owner.playerID.characterName;
             
