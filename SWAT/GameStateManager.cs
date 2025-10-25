@@ -193,7 +193,7 @@ namespace S1thK3nny.SWAT
         /// <summary>
         /// Starts the game
         /// </summary>
-        public void StartGame(bool includeBuildPhase = false)
+        public void StartGame(int buildPhaseTime = 0)
         {
             if (!CanStartGame(out var swat, out var terrorists, out string errorMessage))
             {
@@ -217,12 +217,12 @@ namespace S1thK3nny.SWAT
             SpawnSwatVehicles();
             GivePlayerKits();
 
-            if (includeBuildPhase)
+            if (buildPhaseTime > 0)
             {
                 // Start build phase
                 CurrentState = GameState.BuildPhase;
-                ChatHelper.Broadcast(ChatLevel.INFO, "=== 30 MINUTE BUILD PHASE STARTED ===");
-                gameTimerCoroutine = pluginInstance.StartCoroutine(BuildPhaseTimer());
+                ChatHelper.Broadcast(ChatLevel.INFO, $"=== {buildPhaseTime} MINUTE BUILD PHASE STARTED ===");
+                gameTimerCoroutine = pluginInstance.StartCoroutine(BuildPhaseTimer(buildPhaseTime));
             }
             else
             {
@@ -321,10 +321,20 @@ namespace S1thK3nny.SWAT
         /// <summary>
         /// Build phase timer (30 minutes)
         /// </summary>
-        private IEnumerator BuildPhaseTimer()
+        private IEnumerator BuildPhaseTimer(int buildTimeInMinutes)
         {
-            float buildTime = 30 * 60; // 30 minutes in seconds
-            yield return new WaitForSeconds(buildTime);
+            yield return new WaitForSeconds(buildTimeInMinutes * 60);
+
+            EndBuildPhase();
+        }
+
+        /// <summary>
+        /// Ends the build phase immediately
+        /// </summary>
+        public IEnumerator EndBuildPhase()
+        {
+            if (CurrentState != GameState.BuildPhase)
+                yield break;
 
             ChatHelper.Broadcast(ChatLevel.INFO, "=== BUILD PHASE ENDED ===");
             ChatHelper.Broadcast(ChatLevel.INFO, "Teleporting players back to spawn positions...");

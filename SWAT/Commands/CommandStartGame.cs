@@ -1,6 +1,7 @@
 using Rocket.API;
 using Rocket.Unturned.Player;
 using S1thK3nny.SWAT.Helpers;
+using SDG.Framework.IO.FormattedFiles.KeyValueTables.TypeReaders.UnityTypes;
 using System.Collections.Generic;
 
 namespace S1thK3nny.SWAT.Commands
@@ -13,7 +14,7 @@ namespace S1thK3nny.SWAT.Commands
 
         public string Help => "Starts the SWAT game";
 
-        public string Syntax => "[buildphase]";
+        public string Syntax => "[buildtime]";
 
         public List<string> Aliases => new List<string>();
 
@@ -21,18 +22,18 @@ namespace S1thK3nny.SWAT.Commands
 
         public void Execute(IRocketPlayer caller, string[] command)
         {
-            bool includeBuildPhase = false;
+            var buildTime = 0;
 
             // Check if buildphase parameter is provided
             if (command.Length > 0)
             {
-                if (command[0].ToLower() == "buildphase")
+                if (int.TryParse(command[0], out int parsedBuildTime))
                 {
-                    includeBuildPhase = true;
+                    buildTime = parsedBuildTime;
                 }
                 else
                 {
-                    ChatHelper.SendTo(caller, ChatLevel.ERROR, "Invalid parameter. Use: /swat start [buildphase]");
+                    ChatHelper.SendTo(caller, ChatLevel.ERROR, "Invalid parameter. Use: /start [buildtime]");
                     return;
                 }
             }
@@ -45,10 +46,7 @@ namespace S1thK3nny.SWAT.Commands
             }
 
             // Start the game
-            GameStateManager.Instance.StartGame(includeBuildPhase);
-
-            string phaseMessage = includeBuildPhase ? " with 30-minute build phase" : "";
-            ChatHelper.SendTo(caller, ChatLevel.OK, $"Game started{phaseMessage}!");
+            GameStateManager.Instance.StartGame(buildTime);
         }
     }
 }
