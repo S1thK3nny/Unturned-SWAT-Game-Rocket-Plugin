@@ -138,6 +138,40 @@ namespace S1thK3nny.SWAT
                 }
             }
 
+            // Check if all online players have spawn positions configured on this map
+            string currentMap = Provider.map;
+            var mapData = pluginInstance.perMapInfosDatabase.Maps
+                .FirstOrDefault(m => m.Id == currentMap);
+
+            if (mapData?.Allegiances == null)
+            {
+                errorMessage = $"No allegiance data configured for map '{currentMap}'!";
+                return false;
+            }
+
+            var teamMapData = mapData.Allegiances
+                .FirstOrDefault(a => string.Equals(a.Team, team.ToString(), StringComparison.OrdinalIgnoreCase));
+
+            if (teamMapData == null || teamMapData.Players == null)
+            {
+                errorMessage = $"No spawn positions configured for team {team} on map '{currentMap}'!";
+                return false;
+            }
+
+            // Verify each online player has a spawn position
+            var playersWithSpawns = teamMapData.Players.Select(p => p.Steam64Id).ToHashSet();
+            var missingSpawns = players.Where(steamId => !playersWithSpawns.Contains(steamId)).ToList();
+
+            if (missingSpawns.Count > 0)
+            {
+                var missingPlayerNames = missingSpawns
+                    .Select(id => UnturnedPlayer.FromCSteamID(new Steamworks.CSteamID(id))?.DisplayName ?? id.ToString())
+                    .ToList();
+                
+                errorMessage = $"Team {team} players missing spawn positions: {string.Join(", ", missingPlayerNames)}";
+                return false;
+            }
+
             return true;
         }
 
