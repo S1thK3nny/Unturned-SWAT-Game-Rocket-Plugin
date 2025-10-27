@@ -82,6 +82,8 @@ namespace S1thK3nny.SWAT
             { "CommandRegisterSWATVehicleSaved", "SWAT vehicle [[b]]{0}[[/b]] spawn registered on map [[b]]{1}[[/b]]!" },
 
             { "CommandSetKitSyntax", "Usage: /setkit [kitname] <allegiance> <Steam64ID or PlayerName>" },
+            { "CommandSetKitSuccess", "Set kit [[b]]{0}[[/b]] for allegiance [[b]]{1}[[/b]]." },
+            { "CommandSetKitSuccessBoth", "Set kit [[b]]{0}[[/b]] for both allegiances." },
 
             { "CommandStartInvalidParameter", "Usage: /start [buildtime]" },
 

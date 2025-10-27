@@ -42,9 +42,9 @@ namespace S1thK3nny.SWAT.Commands
                     return;
                 }
             }
-
-            ulong steam64ID = 0;
-            if (command.Length == 3 && !CommandHelpers.TryResolveTargetSteam64ID(caller, command, 2, out steam64ID, out errKey, out errArgs))
+            
+            ulong steam64ID;
+            if (!CommandHelpers.TryResolveTargetSteam64ID(caller, command, 2, out steam64ID, out errKey, out errArgs))
             {
                 ChatHelper.SendTo(caller, errKey, ChatLevel.ERROR, errArgs ?? Array.Empty<object>());
                 return;
@@ -55,10 +55,12 @@ namespace S1thK3nny.SWAT.Commands
                 // Set kit for both allegiances
                 SWATPlugin.Instance.KitInfoDatabase.SetKit(ALLEGIANCE.SWAT, steam64ID, kitName);
                 SWATPlugin.Instance.KitInfoDatabase.SetKit(ALLEGIANCE.TERRORIST, steam64ID, kitName);
+                ChatHelper.SendTo(caller, "CommandSetKitSuccessBoth", ChatLevel.INFO, kitName);
             }
             else
             {
                 SWATPlugin.Instance.KitInfoDatabase.SetKit(givenAllegiance, steam64ID, kitName);
+                ChatHelper.SendTo(caller, "CommandSetKitSuccess", ChatLevel.INFO, kitName, givenAllegiance);
             }
         }
     }

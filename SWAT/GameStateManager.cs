@@ -264,28 +264,41 @@ namespace S1thK3nny.SWAT
 
         private void TeleportPlayersFromAllegianceToSpawns(MapInfo mapData, ALLEGIANCE allegiance)
         {
-            // Map may contain positions for a player under multiple allegiances.
-            // Only teleport if the player's current allegiance (from Allegiance.xml) matches the requested allegiance.
-            var mapAllegiance = mapData.Allegiances?
+            // Guard the plugin & DB
+            var db = pluginInstance?.AllegianceDatabase?.Allegiances;
+            if (db == null) return;
+
+            var mapAllegiance = mapData?.Allegiances?
                 .FirstOrDefault(a => string.Equals(a.Team, allegiance.ToString(), StringComparison.OrdinalIgnoreCase));
 
-            if (mapAllegiance == null)
-                return;
+            if (mapAllegiance?.Players == null) return;
 
-            foreach (var pInfo in mapAllegiance.Players ?? Enumerable.Empty<PlayerInfo>())
+            foreach (var pInfo in mapAllegiance.Players)
             {
-                var steamId = pInfo.Steam64Id;
+                if (pInfo == null) continue;
 
-                // Cross-check against authoritative allegiance database
-                var currentAllegiance = pluginInstance.getPlayerAllegiance(steamId);
-                if (currentAllegiance != allegiance) continue;
+                try
+                {
+                    var steamId = pInfo.Steam64Id;
 
-                var player = UnturnedPlayer.FromCSteamID(new Steamworks.CSteamID(steamId));
-                if (player == null)
-                    continue; // not online
+                    // Find authoritative allegiance entry. If missing, skip to avoid NRE.
+                    var dbEntry = db.FirstOrDefault(a => a.Steam64ID == steamId);
+                    if (dbEntry == null) continue;                        // <- important
+                    if (dbEntry.Team != allegiance) continue;
 
-                player.Player.teleportToLocationUnsafe(pInfo.Position, pInfo.Rotation.y);
-                ChatHelper.SendTo(player, ChatLevel.OK, $"Teleported {player.DisplayName} to {allegiance} spawn position!");
+                    var player = UnturnedPlayer.FromCSteamID(new Steamworks.CSteamID(steamId));
+                    if (player == null || player.Player == null) continue;
+
+                    player.Player.teleportToLocationUnsafe(pInfo.Position, pInfo.Rotation.y);
+                    ChatHelper.SendTo(player, ChatLevel.OK, $"Teleported {player.DisplayName} to {allegiance} spawn position!");
+                }
+                catch (Exception ex)
+                {
+                    // Helpful log to pinpoint bad map entries
+                    Console.WriteLine($"{ScriptTag.GetScriptName()} Teleport error for allegiance {allegiance}: " +
+                                    $"Steam64Id={pInfo?.Steam64Id} Pos={pInfo?.Position} " +
+                                    $"Err={ex.GetType().Name}: {ex.Message}");
+                }
             }
         }
 
@@ -395,34 +408,28 @@ namespace S1thK3nny.SWAT
         private void BeginCombatPhase()
         {
             CurrentState = GameState.InProgress;
-            
-            // Set time to 100 (day time)
-            LightingManager.time = (uint)(100 * LightingManager.cycle);
-            
-            // Heal all alive players
+
+            // Day time
+            LightingManager.time = (uint)(1150 * LightingManager.cycle);
+
             foreach (var steamId in AlivePlayers)
             {
                 var player = UnturnedPlayer.FromCSteamID(new Steamworks.CSteamID(steamId));
-                if (player != null)
-                {
-                    // Fully heal the player
-                    player.Heal(100);
-                    player.Player.life.serverModifyFood(100);
-                    player.Player.life.serverModifyWater(100);
-                    player.Player.life.serverModifyVirus(100);
-                    player.Player.life.serverModifyStamina(100);
+                if (player == null) continue;
 
-                    // Set all skills to 100 by iterating enum values
-                    foreach (Rocket.Unturned.Skills.UnturnedSkill skill in Enum.GetValues(typeof(Rocket.Unturned.Skills.UnturnedSkill)))
-                    {
-                        player.SetSkillLevel(skill, 100);
-                    }
-                }
+                // Fully heal
+                player.Heal(100);
+                player.Player.life.serverModifyFood(100);
+                player.Player.life.serverModifyWater(100);
+                player.Player.life.serverModifyVirus(100);
+                player.Player.life.serverModifyStamina(100);
+                player.Player.skills.ServerUnlockAllSkills();
             }
-            
+
             ChatHelper.Broadcast(ChatLevel.OK, "=== COMBAT PHASE STARTED ===");
             ChatHelper.Broadcast(ChatLevel.OK, "Good luck!");
         }
+
 
         /// <summary>
         /// Starts the UI update coroutine
