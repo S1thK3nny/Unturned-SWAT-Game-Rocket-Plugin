@@ -40,7 +40,7 @@ namespace S1thK3nny.SWAT.Commands
             pluginInstance.AllegianceDatabase.Save();
 
             PlayerNameHelper.RemoveTag(targetSteam64ID);
-            ChatHelper.SendTo(caller, "PlayerUnregisteredFromTeam", ChatLevel.OK, new[] { Convert.ToString(targetSteam64ID), existingData.Team.ToString() });
+            ChatHelper.SendTo(caller, "PlayerUnregisteredFromTeam", ChatLevel.OK, new[] { PlayerNameHelper.GetDisplayName(targetSteam64ID, true), existingData.Team.ToString() });
         }
 
         public AllowedCaller AllowedCaller => AllowedCaller.Both;

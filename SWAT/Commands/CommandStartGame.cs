@@ -22,31 +22,19 @@ namespace S1thK3nny.SWAT.Commands
 
         public void Execute(IRocketPlayer caller, string[] command)
         {
-            var buildTime = 0;
-
-            // Check if buildphase parameter is provided
-            if (command.Length > 0)
-            {
-                if (int.TryParse(command[0], out int parsedBuildTime))
-                {
-                    buildTime = parsedBuildTime;
-                }
-                else
-                {
-                    ChatHelper.SendTo(caller, ChatLevel.ERROR, "Invalid parameter. Use: /start [buildtime]");
-                    return;
-                }
-            }
-
-            // Check if game can start
-            if (!GameStateManager.Instance.CanStartGame(out var swat, out var terrorists, out string errorMessage))
-            {
-                ChatHelper.SendTo(caller, ChatLevel.ERROR, $"Cannot start game: {errorMessage}");
+            if (command.Length > 1) {
+                ChatHelper.SendTo(caller, "CommandStartInvalidParameter", ChatLevel.ERROR);
                 return;
             }
 
-            // Start the game
-            GameStateManager.Instance.StartGame(buildTime);
+            int buildTime = 0;
+            if (command.Length == 1 && !int.TryParse(command[0], out buildTime)) {
+                ChatHelper.SendTo(caller, "CommandStartInvalidParameter", ChatLevel.ERROR);
+                return;
+            }
+
+            // Start the game. StartGame handles any sort of validation internally.
+            GameStateManager.Instance.StartGame(out var error, buildTime);
         }
     }
 }

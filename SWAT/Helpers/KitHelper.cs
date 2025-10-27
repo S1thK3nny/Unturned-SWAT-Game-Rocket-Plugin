@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using Rocket.API;
 using Rocket.Core;
-using Rocket.Unturned.Player;
+using UnturnedPlayer = Rocket.Unturned.Player.UnturnedPlayer;
 
 namespace S1thK3nny.SWAT.Helpers
 {
@@ -22,8 +22,9 @@ namespace S1thK3nny.SWAT.Helpers
         {
             error = null;
 
-            var kitName   = PlayerNameHelper.GetOriginalName(target.Player);
-            var playerArg = target.CSteamID.m_SteamID.ToString();
+            var steam64ID = target.CSteamID.m_SteamID;
+            var kitName   = PlayerNameHelper.GetDisplayName(steam64ID, stripTags: true);
+            var playerArg = steam64ID.ToString();
 
             var kitCmd = GetKitCommand();
             if (kitCmd == null)

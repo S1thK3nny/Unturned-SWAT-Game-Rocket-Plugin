@@ -46,10 +46,10 @@ namespace S1thK3nny.SWAT.Helpers
             => SendInternal(player, level, TranslateAndFormat(translationKey, placeholders));
 
         /// <summary>
-        /// Send a raw (already formatted) message to a specific player with level color.
+        /// Send a raw (already formatted) message to a specific player with level color or custom color.
         /// </summary>
-        public static void SendTo(IRocketPlayer player, ChatLevel level, string message)
-            => SendInternal(player, level, FormatRich(message));
+        public static void SendTo(IRocketPlayer player, ChatLevel level, string message, Color? color = null)
+            => SendInternal(player, level, FormatRich(message), color);
 
         /// <summary>
         /// Broadcast a localized (TranslationList) message to everyone with level color.
@@ -67,7 +67,7 @@ namespace S1thK3nny.SWAT.Helpers
         // Internals
         // ----------------------------
 
-        private static void SendInternal(IRocketPlayer player, ChatLevel level, string richMsg)
+        private static void SendInternal(IRocketPlayer player, ChatLevel level, string richMsg, Color? color = null)
         {
             var plugin = SWATPlugin.Instance;
             if (plugin == null)
@@ -93,7 +93,7 @@ namespace S1thK3nny.SWAT.Helpers
 
             ChatManager.serverSendMessage(
                 richMsg,
-                GetColor(level),
+                color ?? GetColor(level),
                 null,
                 unturnedPlayer.SteamPlayer(),
                 EChatMode.GLOBAL,

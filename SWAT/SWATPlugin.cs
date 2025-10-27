@@ -76,6 +76,8 @@ namespace S1thK3nny.SWAT
             { "CommandRegisterSWATVehicleSyntax", "Usage: /svehicle <vehicleID>" },
             { "CommandRegisterSWATVehicleSaved", "SWAT vehicle [[b]]{0}[[/b]] spawn registered on map [[b]]{1}[[/b]]!" },
 
+            { "CommandStartInvalidParameter", "Usage: /start [buildtime]" },
+
             { "NoGameIsCurrentlyRunning", "No game is currently running!" },
             { "GameIsCurrentlyRunning", "A game is currently running. You cannot use this command right now." }
         };

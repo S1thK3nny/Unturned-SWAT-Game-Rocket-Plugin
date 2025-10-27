@@ -61,6 +61,27 @@ namespace S1thK3nny.SWAT
             }
         }
 
+        public (List<ulong> swat, List<ulong> terrorists) GetTeamsInfo()
+        {
+            List<ulong> swat = pluginInstance.AllegianceDatabase.Allegiances
+                .Where(a => a.Team == ALLEGIANCE.SWAT)
+                .Select(a => a.Steam64ID)
+                .ToList();
+
+            List<ulong> terrorists = pluginInstance.AllegianceDatabase.Allegiances
+                .Where(a => a.Team == ALLEGIANCE.TERRORIST)
+                .Select(a => a.Steam64ID)
+                .ToList();
+
+            swat = swat.Where(IsPlayerOnline).Distinct().ToList();
+            terrorists = terrorists.Where(IsPlayerOnline).Distinct().ToList();
+
+            Console.WriteLine($"SWAT Team: {string.Join(", ", swat)}");
+            Console.WriteLine($"Terrorist Team: {string.Join(", ", terrorists)}");
+
+            return (swat, terrorists);
+        }
+
         /// <summary>
         /// Validates if a game can be started
         /// </summary>
@@ -88,19 +109,7 @@ namespace S1thK3nny.SWAT
             }
 
             // Get all registered players (authoritative from Allegiance.xml)
-            swat = pluginInstance.AllegianceDatabase.Allegiances
-                .Where(a => a.Team == ALLEGIANCE.SWAT)
-                .Select(a => a.Steam64ID)
-                .ToList();
-
-            terrorists = pluginInstance.AllegianceDatabase.Allegiances
-                .Where(a => a.Team == ALLEGIANCE.TERRORIST)
-                .Select(a => a.Steam64ID)
-                .ToList();
-
-            // Only online players are legitimate participants
-            swat = swat.Where(IsPlayerOnline).Distinct().ToList();
-            terrorists = terrorists.Where(IsPlayerOnline).Distinct().ToList();
+            (swat, terrorists) = GetTeamsInfo();
 
             if (!CanStartGameAllegianceCheck(swat, ALLEGIANCE.SWAT, out errorMessage))
                 return false;
@@ -166,7 +175,7 @@ namespace S1thK3nny.SWAT
             if (missingSpawns.Count > 0)
             {
                 var missingPlayerNames = missingSpawns
-                    .Select(id => UnturnedPlayer.FromCSteamID(new Steamworks.CSteamID(id))?.DisplayName ?? id.ToString())
+                    .Select(id => PlayerNameHelper.GetDisplayName(id, stripTags: true))
                     .ToList();
                 
                 errorMessage = $"Team {team} players missing spawn positions: {string.Join(", ", missingPlayerNames)}";
@@ -195,19 +204,19 @@ namespace S1thK3nny.SWAT
         /// Starts the game
         /// </summary>
         /// <param name="buildPhaseTime">Build phase duration in minutes (0 = skip build phase)</param>
-        public void StartGame(int buildPhaseTime = 0)
+        public bool StartGame(out string errorMessage, int buildPhaseTime = 0)
         {
-            CurrentState = GameState.Preparing;
-
-            if (!CanStartGame(out var validSwat, out var validTerrorists, out string errorMessage))
+            // Validate start conditions
+            if (!CanStartGame(out var validSwat, out var validTerrorists, out errorMessage))
             {
                 ChatHelper.Broadcast(ChatLevel.ERROR, $"Cannot start game: {errorMessage}");
-                return;
+                return false;
             }
+            
+            CurrentState = GameState.Preparing;
+
             SwatPlayers = validSwat;
             TerroristPlayers = validTerrorists;
-
-            // Initialize alive players
             AlivePlayers = [.. SwatPlayers.Concat(TerroristPlayers)];
 
             ChatHelper.Broadcast(ChatLevel.INFO, "=== SWAT GAME STARTING ===");
@@ -232,6 +241,7 @@ namespace S1thK3nny.SWAT
 
             // Start UI updates
             StartUIUpdates();
+            return true;
         }
 
         /// <summary>

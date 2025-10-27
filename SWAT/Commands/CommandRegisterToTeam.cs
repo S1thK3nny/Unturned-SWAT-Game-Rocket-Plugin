@@ -63,7 +63,7 @@ namespace S1thK3nny.SWAT.Commands
             pluginInstance.AllegianceDatabase.Save();
 
             PlayerNameHelper.SetPlayerName(targetSteam64ID, allegiance);
-            ChatHelper.SendTo(caller, "PlayerRegisteredToTeam", ChatLevel.OK, new[] { Convert.ToString(targetSteam64ID), allegiance.ToString() });
+            ChatHelper.SendTo(caller, "PlayerRegisteredToTeam", ChatLevel.OK, new[] { PlayerNameHelper.GetDisplayName(targetSteam64ID, true), allegiance.ToString() });
         }
 
         public AllowedCaller AllowedCaller => AllowedCaller.Both;
