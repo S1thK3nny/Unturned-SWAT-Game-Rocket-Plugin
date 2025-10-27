@@ -331,10 +331,17 @@ namespace S1thK3nny.SWAT
         /// <summary>
         /// Ends the build phase immediately
         /// </summary>
-        public IEnumerator EndBuildPhase()
+        public void EndBuildPhase()
         {
             if (CurrentState != GameState.BuildPhase)
-                yield break;
+                return;
+
+            // Stop the build timer coroutine if running
+            if (gameTimerCoroutine != null)
+            {
+                pluginInstance.StopCoroutine(gameTimerCoroutine);
+                gameTimerCoroutine = null;
+            }
 
             ChatHelper.Broadcast(ChatLevel.INFO, "=== BUILD PHASE ENDED ===");
             ChatHelper.Broadcast(ChatLevel.INFO, "Teleporting players back to spawn positions...");
@@ -342,8 +349,16 @@ namespace S1thK3nny.SWAT
             // Teleport players again
             TeleportPlayersToSpawns();
 
-            yield return new WaitForSeconds(5);
+            // Start a short coroutine for the delay before combat
+            pluginInstance.StartCoroutine(StartCombatAfterDelay());
+        }
 
+        /// <summary>
+        /// Waits 5 seconds then starts combat phase
+        /// </summary>
+        private IEnumerator StartCombatAfterDelay()
+        {
+            yield return new WaitForSeconds(5);
             BeginCombatPhase();
         }
 
