@@ -18,8 +18,9 @@ namespace S1thK3nny.SWAT
     {
         public static SWATPlugin Instance { get; private set; }
         public UnityEngine.Color MessageColor { get; set; }
-        public AllegianceXmlDatabase AllegianceDatabase { get; private set; } = new();
-        public PerMapInfosXmlDatabase perMapInfosDatabase = new();
+        public AllegianceXmlDatabase AllegianceDatabase;
+        public PerMapInfosXmlDatabase perMapInfosDatabase;
+        public KitInfoXmlDatabase KitInfoDatabase;
 
         // This appears whenever Rocket loads the plugin
         protected override void Load()
@@ -31,6 +32,9 @@ namespace S1thK3nny.SWAT
 
             perMapInfosDatabase = new PerMapInfosXmlDatabase();
             perMapInfosDatabase.Load();
+
+            KitInfoDatabase = new KitInfoXmlDatabase();
+            KitInfoDatabase.Load();
 
             // Initialize GameStateManager
             GameStateManager.Initialize();
@@ -52,6 +56,7 @@ namespace S1thK3nny.SWAT
 
             AllegianceDatabase.Save();
             perMapInfosDatabase.Save();
+            KitInfoDatabase.Save();
 
             Logger.Log($"{Name} has been unloaded!", ConsoleColor.Yellow);
         }
@@ -75,6 +80,8 @@ namespace S1thK3nny.SWAT
 
             { "CommandRegisterSWATVehicleSyntax", "Usage: /svehicle <vehicleID>" },
             { "CommandRegisterSWATVehicleSaved", "SWAT vehicle [[b]]{0}[[/b]] spawn registered on map [[b]]{1}[[/b]]!" },
+
+            { "CommandSetKitSyntax", "Usage: /setkit [kitname] <allegiance> <Steam64ID or PlayerName>" },
 
             { "CommandStartInvalidParameter", "Usage: /start [buildtime]" },
 

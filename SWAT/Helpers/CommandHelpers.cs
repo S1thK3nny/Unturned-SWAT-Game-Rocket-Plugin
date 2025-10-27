@@ -17,6 +17,9 @@ namespace S1thK3nny.SWAT.Helpers
         /// Accepts either a Steam64ID or a player name.
         /// Returns an error key and placeholders on failure.
         /// </summary>
+        /// <param name="caller">The command caller.</param>
+        /// <param name="command">The command arguments.</param>
+        /// <param name="argIndex">The index of the argument to check for Steam64ID or player name.</param>
         public static bool TryResolveTargetSteam64ID(
             IRocketPlayer caller,
             string[] command,

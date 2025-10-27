@@ -300,7 +300,7 @@ namespace S1thK3nny.SWAT
 
             if (mapData?.SwatVehicleInfos != null)
             {
-                ushort vehicleId = (ushort)mapData.SwatVehicleInfos.VehicleID;
+                ushort vehicleId = mapData.SwatVehicleInfos.VehicleID;
                 Vector3 position = mapData.SwatVehicleInfos.SpawnPosition;
                 Quaternion rotation = Quaternion.Euler(mapData.SwatVehicleInfos.SpawnRotation);
 
@@ -315,7 +315,7 @@ namespace S1thK3nny.SWAT
         /// </summary>
         private void GivePlayerKits()
         {
-            foreach (var steamId in SwatPlayers.Concat(TerroristPlayers))
+            foreach (var steamId in SwatPlayers)
             {
                 var player = UnturnedPlayer.FromCSteamID(new Steamworks.CSteamID(steamId));
                 if (player != null)
@@ -323,7 +323,19 @@ namespace S1thK3nny.SWAT
                     // Execute /kit <PlayerName> <PlayerName>
                     // This assumes you have RestoreMonarchys Kits plugin installed
                     // If names contain spaces, wrap in quotes
-                    if (!KitGiver.TryGiveKitToPlayer(player, out string error))
+                    if (!KitGiver.TryGiveKitToPlayer(player, ALLEGIANCE.SWAT, out string error))
+                    {
+                        ChatHelper.SendTo(player, ChatLevel.ERROR, $"Failed to give kit to {player.DisplayName}: {error}");
+                    }
+                }
+            }
+
+            foreach (var steamId in TerroristPlayers)
+            {
+                var player = UnturnedPlayer.FromCSteamID(new Steamworks.CSteamID(steamId));
+                if (player != null)
+                {
+                    if (!KitGiver.TryGiveKitToPlayer(player, ALLEGIANCE.TERRORIST, out string error))
                     {
                         ChatHelper.SendTo(player, ChatLevel.ERROR, $"Failed to give kit to {player.DisplayName}: {error}");
                     }
