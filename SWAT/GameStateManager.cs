@@ -8,6 +8,7 @@ using UnityEngine;
 using S1thK3nny.SWAT.Models.Teams;
 using S1thK3nny.SWAT.Helpers;
 using S1thK3nny.SWAT.Models.Databases;
+using Rocket.API;
 
 namespace S1thK3nny.SWAT
 {
@@ -193,18 +194,18 @@ namespace S1thK3nny.SWAT
         /// <summary>
         /// Starts the game
         /// </summary>
+        /// <param name="buildPhaseTime">Build phase duration in minutes (0 = skip build phase)</param>
         public void StartGame(int buildPhaseTime = 0)
         {
-            if (!CanStartGame(out var swat, out var terrorists, out string errorMessage))
+            CurrentState = GameState.Preparing;
+
+            if (!CanStartGame(out var validSwat, out var validTerrorists, out string errorMessage))
             {
                 ChatHelper.Broadcast(ChatLevel.ERROR, $"Cannot start game: {errorMessage}");
                 return;
             }
-
-            CurrentState = GameState.Preparing;
-
-            SwatPlayers = swat;
-            TerroristPlayers = terrorists;
+            SwatPlayers = validSwat;
+            TerroristPlayers = validTerrorists;
 
             // Initialize alive players
             AlivePlayers = [.. SwatPlayers.Concat(TerroristPlayers)];
@@ -368,6 +369,25 @@ namespace S1thK3nny.SWAT
         private void BeginCombatPhase()
         {
             CurrentState = GameState.InProgress;
+            
+            // Set time to 100 (day time)
+            LightingManager.time = (uint)(100 * LightingManager.cycle);
+            
+            // Heal all alive players
+            foreach (var steamId in AlivePlayers)
+            {
+                var player = UnturnedPlayer.FromCSteamID(new Steamworks.CSteamID(steamId));
+                if (player != null)
+                {
+                    // Fully heal the player
+                    player.Heal(100);
+                    player.Player.life.serverModifyFood(100);
+                    player.Player.life.serverModifyWater(100);
+                    player.Player.life.serverModifyVirus(100);
+                    player.Player.life.serverModifyStamina(100);
+                }
+            }
+            
             ChatHelper.Broadcast(ChatLevel.OK, "=== COMBAT PHASE STARTED ===");
             ChatHelper.Broadcast(ChatLevel.OK, "Good luck!");
         }
