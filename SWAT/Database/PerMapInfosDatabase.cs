@@ -29,7 +29,7 @@ namespace S1thK3nny.SWAT.Database
                     Database.Maps = new List<MapInfo>();
                 }
 
-                Console.WriteLine($"[SWATPlugin] Loaded {Database.Maps.Count} map records from XML database.");
+                Console.WriteLine($"{ScriptTag.GetScriptName()} Loaded {Database.Maps.Count} map records from XML database.");
             }
             else
             {
@@ -45,7 +45,7 @@ namespace S1thK3nny.SWAT.Database
         {
             using StreamWriter writer = new(filePath);
             xmlSerializer.Serialize(writer, Database);
-            Console.WriteLine($"[SWATPlugin] Saved {Database.Maps.Count} map records to XML database.");
+            Console.WriteLine($"{ScriptTag.GetScriptName()} Saved {Database.Maps.Count} map records to XML database.");
         }
     }
 }

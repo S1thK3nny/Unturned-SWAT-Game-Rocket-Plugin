@@ -51,7 +51,7 @@ namespace S1thK3nny.SWAT.Commands
                 existingData.Team = allegiance;
 
                 PlayerNameHelper.SetPlayerName(targetSteam64ID, allegiance);
-                ChatHelper.SendTo(caller, "PlayerSwitchedTeams", ChatLevel.OK, new[] { Convert.ToString(targetSteam64ID), allegiance.ToString() });
+                ChatHelper.SendTo(caller, "PlayerSwitchedTeams", ChatLevel.OK, new[] { PlayerNameHelper.GetDisplayName(targetSteam64ID, true), allegiance.ToString() });
 
                 pluginInstance.AllegianceDatabase.Save();
                 return;

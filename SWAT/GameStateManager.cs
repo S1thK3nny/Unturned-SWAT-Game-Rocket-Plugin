@@ -76,8 +76,8 @@ namespace S1thK3nny.SWAT
             swat = swat.Where(IsPlayerOnline).Distinct().ToList();
             terrorists = terrorists.Where(IsPlayerOnline).Distinct().ToList();
 
-            Console.WriteLine($"SWAT Team: {string.Join(", ", swat)}");
-            Console.WriteLine($"Terrorist Team: {string.Join(", ", terrorists)}");
+            Console.WriteLine($"{ScriptTag.GetScriptName()} SWAT Team: {string.Join(", ", swat)}");
+            Console.WriteLine($"{ScriptTag.GetScriptName()} Terrorist Team: {string.Join(", ", terrorists)}");
 
             return (swat, terrorists);
         }
@@ -212,6 +212,8 @@ namespace S1thK3nny.SWAT
                 ChatHelper.Broadcast(ChatLevel.ERROR, $"Cannot start game: {errorMessage}");
                 return false;
             }
+
+            Console.WriteLine($"{ScriptTag.GetScriptName()} Starting game...");
             
             CurrentState = GameState.Preparing;
 
@@ -353,6 +355,8 @@ namespace S1thK3nny.SWAT
                 pluginInstance.StopCoroutine(gameTimerCoroutine);
                 gameTimerCoroutine = null;
             }
+
+            Console.WriteLine($"{ScriptTag.GetScriptName()} Ending build phase...");
 
             ChatHelper.Broadcast(ChatLevel.INFO, "=== BUILD PHASE ENDED ===");
             ChatHelper.Broadcast(ChatLevel.INFO, "Teleporting players back to spawn positions...");

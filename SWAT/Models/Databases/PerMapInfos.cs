@@ -26,7 +26,7 @@ namespace S1thK3nny.SWAT.Models.Databases
     public class SwatVehicleInfos
     {
         [XmlElement("VehicleID")]
-        public long VehicleID { get; set; }
+        public ushort VehicleID { get; set; }
         [XmlElement("SpawnPosition")]
         public Vector3 SpawnPosition { get; set; } = new Vector3();
 

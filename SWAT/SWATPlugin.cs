@@ -64,11 +64,11 @@ namespace S1thK3nny.SWAT
             { "InvalidSteam64IDOrPlayerName", "Invalid Steam64ID or PlayerName: {0}" },
             { "MustSpecifySteam64IDFromConsole", "You must specify a Steam64ID when using this command from console." },
 
-            { "PlayerSwitchedTeams", "Player {0} has switched to team [[b]]{1}[[/b]]!" },
-            { "PlayerRegisteredToTeam", "Player {0} has been registered to team [[b]]{1}[[/b]]!" },
+            { "PlayerSwitchedTeams", "Player [[b]]{0}[[/b]] has switched to team [[b]]{1}[[/b]]!" },
+            { "PlayerRegisteredToTeam", "Player [[b]]{0}[[/b]] has been registered to team [[b]]{1}[[/b]]!" },
 
-            { "PlayerNotRegistered", "Player {0} is not registered to any team." },
-            { "PlayerUnregisteredFromTeam", "Player {0} has been unregistered from team [[b]]{1}[[/b]]!" },
+            { "PlayerNotRegistered", "Player [[b]]{0}[[/b]] is not registered to any team." },
+            { "PlayerUnregisteredFromTeam", "Player [[b]]{0}[[/b]] has been unregistered from team [[b]]{1}[[/b]]!" },
 
             { "CommandRegisterPositionSyntax", "Usage: /sposition [Allegiance]" },
             { "CommandRegisterPositionSaved", "Position registered for player [[b]]{0}[[/b]] for team [[b]]{1}[[/b]] on map [[b]]{2}[[/b]]!" },
@@ -104,8 +104,8 @@ namespace S1thK3nny.SWAT
             {
                 PlayerNameHelper.SetPlayerName(unturnedPlayer.CSteamID.m_SteamID, allegiance);
             }
-            Console.WriteLine($"[SWATPlugin] Player connected: {unturnedPlayer.DisplayName} ({unturnedPlayer.CSteamID.m_SteamID})");
-            Console.WriteLine($"[SWATPlugin] Allegiance data: {allegiance}");
+            Console.WriteLine($"{ScriptTag.GetScriptName()} Player connected: {unturnedPlayer.DisplayName} ({unturnedPlayer.CSteamID.m_SteamID})");
+            Console.WriteLine($"{ScriptTag.GetScriptName()} Allegiance data: {allegiance}");
         }
 
         // Event handler for player deaths

@@ -29,7 +29,7 @@ namespace S1thK3nny.SWAT.Database
                     Database.Allegiances = new List<AllegianceData>();
                 }
 
-                Console.WriteLine($"[SWATPlugin] Loaded {Database.Allegiances.Count} allegiance records from XML database.");
+                Console.WriteLine($"{ScriptTag.GetScriptName()} Loaded {Database.Allegiances.Count} allegiance records from XML database.");
             }
             else
             {
@@ -45,7 +45,7 @@ namespace S1thK3nny.SWAT.Database
         {
             using StreamWriter writer = new(filePath);
             xmlSerializer.Serialize(writer, Database);
-            Console.WriteLine($"[SWATPlugin] Saved {Database.Allegiances.Count} allegiance records to XML database.");
+            Console.WriteLine($"{ScriptTag.GetScriptName()} Saved {Database.Allegiances.Count} allegiance records to XML database.");
         }
     }
 }

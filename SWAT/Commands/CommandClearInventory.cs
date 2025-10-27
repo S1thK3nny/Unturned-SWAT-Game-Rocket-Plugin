@@ -16,7 +16,7 @@ namespace S1thK3nny.SWAT.Commands
 
         public string Syntax => "";
 
-        public List<string> Aliases => new List<string> { "cinventory" };
+        public List<string> Aliases => new List<string> { "cinv" };
 
         public List<string> Permissions => new List<string> { "swat.clearinventory" };
 

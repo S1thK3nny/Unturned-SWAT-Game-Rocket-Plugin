@@ -86,8 +86,8 @@ namespace S1thK3nny.SWAT.Commands
 
             pluginInstance.perMapInfosDatabase.Save();
 
-            Console.WriteLine($"[SWATPlugin] Registered position for player {steam64ID} at position {payload.Position} on map {mapId} for team {teamKey}.");
-            ChatHelper.SendTo(caller, "CommandRegisterPositionSaved", ChatLevel.OK, new[] { Convert.ToString(steam64ID), teamKey, mapId });
+            Console.WriteLine($"{ScriptTag.GetScriptName()} Registered position for player {steam64ID} at position {payload.Position} on map {mapId} for team {teamKey}.");
+            ChatHelper.SendTo(caller, "CommandRegisterPositionSaved", ChatLevel.OK, new[] { PlayerNameHelper.GetDisplayName(steam64ID, true), teamKey, mapId });
         }
 
         public AllowedCaller AllowedCaller => AllowedCaller.Player;
