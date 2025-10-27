@@ -385,6 +385,12 @@ namespace S1thK3nny.SWAT
                     player.Player.life.serverModifyWater(100);
                     player.Player.life.serverModifyVirus(100);
                     player.Player.life.serverModifyStamina(100);
+
+                    // Set all skills to 100 by iterating enum values
+                    foreach (Rocket.Unturned.Skills.UnturnedSkill skill in Enum.GetValues(typeof(Rocket.Unturned.Skills.UnturnedSkill)))
+                    {
+                        player.SetSkillLevel(skill, 100);
+                    }
                 }
             }
             
