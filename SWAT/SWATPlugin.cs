@@ -85,6 +85,14 @@ namespace S1thK3nny.SWAT
             { "CommandSetKitSuccess", "Set kit [[b]]{0}[[/b]] for allegiance [[b]]{1}[[/b]]." },
             { "CommandSetKitSuccessBoth", "Set kit [[b]]{0}[[/b]] for both allegiances." },
 
+            { "CommandClearUsage", "Usage: /clear <all|a|buildings|b|inventory|inv|items|i|vehicles|v>" },
+            { "CommandClearInvalidProperty", "Invalid property. Use: <all|a|buildings|b|inventory|inv|items|i|vehicles|v>" },
+            { "CommandClearItemsSuccess", "Removed {0} items from the map." },
+            { "CommandClearInventorySuccess", "Cleared inventory for player [[b]]{0}[[/b]]." },
+            { "CommandClearVehiclesSuccess", "Removed {0} vehicles from the map." },
+            { "CommandClearBuildingsSuccess", "Removed {0} structures and {1} barricades from the map." },
+            { "CommandClearAllSuccess", "Removed {0} items, {1} vehicles, {2} structures, and {3} barricades from the map." },
+
             { "CommandStartInvalidParameter", "Usage: /start [buildtime]" },
 
             { "NoGameIsCurrentlyRunning", "No game is currently running!" },

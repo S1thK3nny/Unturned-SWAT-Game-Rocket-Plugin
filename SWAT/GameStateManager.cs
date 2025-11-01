@@ -8,7 +8,6 @@ using UnityEngine;
 using S1thK3nny.SWAT.Models.Teams;
 using S1thK3nny.SWAT.Helpers;
 using S1thK3nny.SWAT.Models.Databases;
-using Rocket.API;
 
 namespace S1thK3nny.SWAT
 {
@@ -227,7 +226,6 @@ namespace S1thK3nny.SWAT
 
             TeleportPlayersToSpawns();
             SpawnSwatVehicles();
-            GivePlayerKits();
 
             if (buildPhaseTime > 0)
             {
@@ -388,6 +386,11 @@ namespace S1thK3nny.SWAT
 
             // Teleport players again
             TeleportPlayersToSpawns();
+
+            ClearHelper.ClearAllInventories(AlivePlayers);
+            GivePlayerKits();
+
+            ChatHelper.Broadcast(ChatLevel.INFO, "Combat phase starting in 5 seconds...");
 
             // Start a short coroutine for the delay before combat
             pluginInstance.StartCoroutine(StartCombatAfterDelay());
