@@ -58,7 +58,7 @@ namespace S1thK3nny.SWAT.Commands
                         return;
                     }
                     ClearHelper.ClearInventory(uPlayer);
-                    ChatHelper.SendTo(caller, "CommandClearInventorySuccess", ChatLevel.INFO, PlayerNameHelper.GetDisplayName(uPlayer.CSteamID.m_SteamID));
+                    ChatHelper.SendTo(caller, "CommandClearInventorySuccess", ChatLevel.INFO, PlayerNameHelper.GetDisplayName(uPlayer.CSteamID.m_SteamID, true));
                     break;
 
                 case "all":

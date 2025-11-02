@@ -388,6 +388,7 @@ namespace S1thK3nny.SWAT
             TeleportPlayersToSpawns();
 
             ClearHelper.ClearAllInventories(AlivePlayers);
+            ClearHelper.ClearItems();
             GivePlayerKits();
 
             ChatHelper.Broadcast(ChatLevel.INFO, "Combat phase starting in 5 seconds...");

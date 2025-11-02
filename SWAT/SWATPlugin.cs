@@ -39,6 +39,9 @@ namespace S1thK3nny.SWAT
             // Initialize GameStateManager
             GameStateManager.Initialize();
 
+            // Initialize CommandInterceptor
+            CommandInterceptor.Initialize();
+
             U.Events.OnPlayerConnected += OnPlayerConnected;
             UnturnedPlayerEvents.OnPlayerDeath += OnPlayerDeath;
 
@@ -53,6 +56,9 @@ namespace S1thK3nny.SWAT
 
             // Shutdown GameStateManager
             GameStateManager.Shutdown();
+
+            // Shutdown CommandInterceptor
+            CommandInterceptor.Shutdown();
 
             AllegianceDatabase.Save();
             perMapInfosDatabase.Save();
