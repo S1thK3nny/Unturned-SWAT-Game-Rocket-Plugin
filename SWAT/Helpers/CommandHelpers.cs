@@ -111,6 +111,7 @@ namespace S1thK3nny.SWAT.Helpers
         {
             errorKey = null;
             errorArgs = null;
+            token = token.ToUpper();
 
             // Try direct enum parse first (SWAT, TERRORIST, etc.)
             if (Enum.TryParse(token, true, out allegiance) && allegiance != ALLEGIANCE.None)
