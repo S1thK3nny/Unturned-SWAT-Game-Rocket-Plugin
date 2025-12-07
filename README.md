@@ -71,6 +71,12 @@ or
 /sregister TERRORIST
 ```
 
+**Quick Tip**: You can use abbreviations `S` for SWAT and `T` for TERRORIST:
+```
+/sregister S
+/sregister T
+```
+
 **Aliases**: `/steam`
 
 **Note**: Admins can register other players by adding their name or Steam64ID:
@@ -224,11 +230,16 @@ Or start immediately without build phase:
 - **All players** are teleported back to their spawn positions
 - **All inventories are cleared**
 - **Kits are automatically given** to all players
+- **Environment randomization**: Time of day (dawn, day, dusk, or night) and weather (clear, rain, or snow) are randomly set for variety
 - **SWAT**: Takes the vehicle and drives to the terrorist location
 - **Terrorists**: Defend their position using fortifications and tactics
 - **Combat begins!**
 
-#### 5. **Victory**
+#### 5. **During Combat**
+- Eliminated players are removed from the game and can use commands again (e.g., `/give`, `/vehicle`, `/home`)
+- Alive players in the match cannot use restricted commands to prevent cheating
+
+#### 6. **Victory**
 - When all members of one team are eliminated, the other team wins
 - Game ends automatically
 - Victory is announced

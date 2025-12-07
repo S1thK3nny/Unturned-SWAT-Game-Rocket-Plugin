@@ -101,6 +101,7 @@ namespace S1thK3nny.SWAT.Helpers
 
         /// <summary>
         /// Parses allegiance from string input robustly.
+        /// Supports abbreviations: S for SWAT, T for TERRORIST.
         /// </summary>
         public static bool TryParseAllegiance(
             string token,
@@ -111,8 +112,20 @@ namespace S1thK3nny.SWAT.Helpers
             errorKey = null;
             errorArgs = null;
 
+            // Try direct enum parse first (SWAT, TERRORIST, etc.)
             if (Enum.TryParse(token, true, out allegiance) && allegiance != ALLEGIANCE.None)
                 return true;
+
+            // Check for abbreviations
+            switch (token.ToUpper())
+            {
+                case "S":
+                    allegiance = ALLEGIANCE.SWAT;
+                    return true;
+                case "T":
+                    allegiance = ALLEGIANCE.TERRORIST;
+                    return true;
+            }
 
             allegiance = ALLEGIANCE.None;
             errorKey = "InvalidAllegiance";

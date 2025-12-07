@@ -236,6 +236,8 @@ namespace S1thK3nny.SWAT
             }
             else
             {
+                // No build phase - give kits immediately and start combat
+                PreparePlayersForCombat();
                 BeginCombatPhase();
             }
 
@@ -321,6 +323,16 @@ namespace S1thK3nny.SWAT
         }
 
         /// <summary>
+        /// Prepares players for combat by optionally clearing inventories/items and giving kits.
+        /// </summary>
+        private void PreparePlayersForCombat()
+        {
+            ClearHelper.ClearAllInventories(AlivePlayers);
+            ClearHelper.ClearItems();
+            GivePlayerKits();
+        }
+
+        /// <summary>
         /// Gives kits to all players using /kit command.
         /// Uses player display names instead of Steam64IDs.
         /// </summary>
@@ -387,9 +399,8 @@ namespace S1thK3nny.SWAT
             // Teleport players again
             TeleportPlayersToSpawns();
 
-            ClearHelper.ClearAllInventories(AlivePlayers);
-            ClearHelper.ClearItems();
-            GivePlayerKits();
+            // Clear build phase items and give combat kits
+            PreparePlayersForCombat();
 
             ChatHelper.Broadcast(ChatLevel.INFO, "Combat phase starting in 5 seconds...");
 
@@ -407,14 +418,59 @@ namespace S1thK3nny.SWAT
         }
 
         /// <summary>
+        /// Sets random time and weather for variety in each match
+        /// </summary>
+        private void RandomizeEnvironment()
+        {
+            System.Random random = new System.Random();
+
+            // Random time of day (0-3600 seconds in Unturned's day cycle)
+            // Full 24-hour cycle for maximum variety
+            uint randomTime = (uint)(random.Next(0, 3600) * LightingManager.cycle);
+            LightingManager.time = randomTime;
+
+            // Random weather using WeatherAssetBase
+            string[] weatherOptions =
+            [
+                "none",   // Clear weather (weighted)
+                "none",   // Clear weather (weighted more)
+                "storm",  // Rain
+                "blizzard" // Snow (if map supports it)
+            ];
+
+            string selectedWeather = weatherOptions[random.Next(weatherOptions.Length)];
+            
+            if (selectedWeather == "none")
+            {
+                LightingManager.ResetScheduledWeather();
+            }
+            else if (selectedWeather == "storm")
+            {
+                WeatherAssetBase rainWeather = WeatherAssetBase.DEFAULT_RAIN.Find();
+                if (rainWeather != null)
+                {
+                    LightingManager.ForecastWeatherImmediately(rainWeather);
+                }
+            }
+            else if (selectedWeather == "blizzard")
+            {
+                WeatherAssetBase snowWeather = WeatherAssetBase.DEFAULT_SNOW.Find();
+                if (snowWeather != null)
+                {
+                    LightingManager.ForecastWeatherImmediately(snowWeather);
+                }
+            }
+        }
+
+        /// <summary>
         /// Begins the combat phase
         /// </summary>
         private void BeginCombatPhase()
         {
             CurrentState = GameState.InProgress;
 
-            // Day time
-            LightingManager.time = (uint)(1150 * LightingManager.cycle);
+            // Randomize time and weather
+            RandomizeEnvironment();
 
             foreach (var steamId in AlivePlayers)
             {

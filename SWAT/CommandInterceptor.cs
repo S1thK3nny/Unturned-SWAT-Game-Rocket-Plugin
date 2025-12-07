@@ -12,10 +12,10 @@ namespace S1thK3nny.SWAT
         private static CommandInterceptor _instance;
 
         // Commands allowed ONLY during Idle and BuildPhase
-        private static readonly string[] allowedDuringBuildCommands = { "give", "vehicle", "v", "heal", "god", "kit" };
+        private static readonly string[] allowedDuringBuildCommands = { "give", "vehicle", "v", "heal", "god", "kit", "tpa", "tp", "teleport" };
         
         // Commands blocked at all times during games
-        private static readonly string[] alwaysBlockedCommands = { "spy", "tpa", "tp", "home" };
+        private static readonly string[] alwaysBlockedCommands = { "spy", "home" };
 
         public static void Initialize()
         {
@@ -38,6 +38,8 @@ namespace S1thK3nny.SWAT
         private void OnCommandExecuted(IRocketPlayer player, IRocketCommand command, ref bool cancel)
         {
             string cmdName = command.Name.ToLower();
+
+            if (player is ConsolePlayer) return; // Never block console commands
             
             // Check if this is an allowed build command (give, vehicle, v)
             bool isAllowedBuildCommand = allowedDuringBuildCommands.Contains(cmdName) || 
@@ -49,13 +51,17 @@ namespace S1thK3nny.SWAT
             
             GameState currentState = GameStateManager.Instance.CurrentState;
             
-            // Block always-blocked commands during any non-Idle state
-            if (isAlwaysBlocked && currentState != GameState.Idle)
+            // Get player's Steam64ID for alive check
+            UnturnedPlayer uPlayer = player as UnturnedPlayer;
+            ulong playerSteamId = uPlayer?.CSteamID.m_SteamID ?? 0;
+            bool isPlayerAlive = GameStateManager.Instance.AlivePlayers.Contains(playerSteamId);
+            
+            // Block always-blocked commands during any non-Idle state (only for alive players)
+            if (isAlwaysBlocked && currentState != GameState.Idle && isPlayerAlive)
             {
                 cancel = true;
                 
                 // Penalize the player for attempting to use a blocked command
-                UnturnedPlayer uPlayer = player as UnturnedPlayer;
                 if (uPlayer != null && uPlayer.Player != null)
                 {
                     uPlayer.Player.life.serverModifyHealth(-50);
@@ -68,13 +74,12 @@ namespace S1thK3nny.SWAT
                 return;
             }
             
-            // Block allowed-build commands during InProgress state
-            if (isAllowedBuildCommand && currentState == GameState.InProgress)
+            // Block allowed-build commands during InProgress state (only for alive players)
+            if (isAllowedBuildCommand && currentState == GameState.InProgress && isPlayerAlive)
             {
                 cancel = true;
                 
                 // Penalize the player for attempting to use a blocked command
-                UnturnedPlayer uPlayer = player as UnturnedPlayer;
                 if (uPlayer != null && uPlayer.Player != null)
                 {
                     uPlayer.Player.life.serverModifyHealth(-50);
