@@ -420,24 +420,55 @@ namespace S1thK3nny.SWAT
         /// <summary>
         /// Sets random time and weather for variety in each match
         /// </summary>
-        private void RandomizeEnvironment()
+        public void RandomizeEnvironment()
         {
-            System.Random random = new System.Random();
+            System.Random random = new System.Random(Environment.TickCount + DateTime.Now.Millisecond);
 
-            // Random time of day (0-3600 seconds in Unturned's day cycle)
-            // Full 24-hour cycle for maximum variety
-            uint randomTime = (uint)(random.Next(0, 3600) * LightingManager.cycle);
-            LightingManager.time = randomTime;
+            // Define specific time periods with weights for more interesting variety
+            float bias = LevelLighting.bias;
+            uint cycle = LightingManager.cycle == 0 ? 3600u : LightingManager.cycle;
 
-            // Random weather using WeatherAssetBase
-            string[] weatherOptions =
-            [
-                "none",   // Clear weather (weighted)
-                "none",   // Clear weather (weighted more)
-                "storm",  // Rain
-                "blizzard" // Snow (if map supports it)
-            ];
+            // Weighted time period selection for more dramatic variety
+            int timeChoice = random.Next(100);
+            uint randomTimeSeconds;
+            string timeOfDay;
 
+            if (timeChoice < 20) // 20% - Early Morning (dawn)
+            {
+                randomTimeSeconds = (uint)(cycle * random.NextDouble() * 0.1f); // First 10% of day
+                timeOfDay = "Dawn";
+            }
+            else if (timeChoice < 45) // 25% - Midday (bright)
+            {
+                randomTimeSeconds = (uint)(cycle * (0.3f + random.NextDouble() * 0.2f)); // Middle of day
+                timeOfDay = "Midday";
+            }
+            else if (timeChoice < 60) // 15% - Late Afternoon
+            {
+                randomTimeSeconds = (uint)(cycle * (bias - 0.1f + random.NextDouble() * 0.1f)); // Just before dusk
+                timeOfDay = "Late Afternoon";
+            }
+            else if (timeChoice < 75) // 15% - Dusk (transition)
+            {
+                randomTimeSeconds = (uint)(cycle * (bias + random.NextDouble() * 0.05f)); // Just after bias
+                timeOfDay = "Dusk";
+            }
+            else if (timeChoice < 90) // 15% - Deep Night (dark)
+            {
+                float nightMid = bias + (1f - bias) * 0.5f; // Middle of night
+                randomTimeSeconds = (uint)(cycle * (nightMid - 0.1f + random.NextDouble() * 0.2f));
+                timeOfDay = "Night";
+            }
+            else // 10% - Pre-dawn (very dark)
+            {
+                randomTimeSeconds = (uint)(cycle * (1f - 0.05f + random.NextDouble() * 0.05f)); // Very end of cycle
+                timeOfDay = "Pre-Dawn";
+            }
+
+            LightingManager.time = randomTimeSeconds;
+
+            // Random weather
+            string[] weatherOptions = ["none", "none", "none", "storm", "blizzard"];
             string selectedWeather = weatherOptions[random.Next(weatherOptions.Length)];
             
             if (selectedWeather == "none")
@@ -460,6 +491,24 @@ namespace S1thK3nny.SWAT
                     LightingManager.ForecastWeatherImmediately(snowWeather);
                 }
             }
+
+            string weatherDesc = GetWeatherString(selectedWeather);
+            ChatHelper.Broadcast(ChatLevel.INFO, $"Environment: {timeOfDay}, {weatherDesc}");
+            Console.WriteLine($"{ScriptTag.GetScriptName()} Environment randomized: Time={randomTimeSeconds}s ({timeOfDay}), Weather={weatherDesc}");
+        }
+
+        /// <summary>
+        /// Gets a friendly description of the weather
+        /// </summary>
+        private string GetWeatherString(string weather)
+        {
+            return weather switch
+            {
+                "none" => "Clear Skies",
+                "storm" => "Rainy",
+                "blizzard" => "Snowy",
+                _ => "Clear"
+            };
         }
 
         /// <summary>
